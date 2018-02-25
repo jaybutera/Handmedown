@@ -18,11 +18,18 @@ contract Handmedown {
       bool isGiveReq;
    }
 
+   event RequestMade(address requester, address requestee, bool isGiveReq);
+
    function acceptHandoff (address _asset) public {
       //entities[_leasee].assets[_asset] = true;
       //entities[_asset].owners[_leasee] = true;
       entities[msg.sender].assets.push( _asset );
       entities[_asset].owners.push( msg.sender );
+   }
+
+   function requestHandoff (address _asset, address _leasee) public canClaim(_asset){
+      requests[ _asset ] = Request(msg.sender, _leasee, true);
+      RequestMade(msg.sender, _leasee, true);
    }
 
    function requestReturn (address _asset, address _leasee) public {
@@ -42,6 +49,13 @@ contract Handmedown {
       for (i = 0; i < assets.length; i++) {
          if ( assets[i] == _asset )
             delete entities[msg.sender].assets[i];
+      }
+   }
+
+   modifier canClaim(address _asset){
+      for(uint i = 0; i < entities[_asset].owners.length; i++){
+         if(entities[_asset].owners[i] == msg.sender)
+            _;
       }
    }
 
