@@ -4,6 +4,7 @@ contract Handmedown {
    mapping(address => Entity) entities;
    // Maps a child to a request object
    mapping(address => Request) requests;
+   address rootOwner;
 
    struct Entity {
       address[] owners;
@@ -18,13 +19,23 @@ contract Handmedown {
       bool isGiveReq;
    }
 
+   function Handmedown () public {
+      rootOwner = msg.sender;
+   }
+
+   function assignAsset (address _asset, address _owner) public {
+      require(msg.sender == rootOwner);
+      entities[_owner].assets.push(_asset);
+      entities[_asset].owners.push(_owner);
+   }
+
    event RequestMade(address requester, address requestee, bool isGiveReq);
 
-   function acceptHandoff (address _asset, address _leasee) public {
+   function acceptHandoff (address _asset) public {
       //entities[_leasee].assets[_asset] = true;
       //entities[_asset].owners[_leasee] = true;
       //Make sure msg.sender is fulfilling an existing request
-      require(requests[_asset].requestee == _leasee && requests[_asset].isGiveReq == true);
+      require(requests[_asset].requestee == msg.sender && requests[_asset].isGiveReq == true);
       entities[msg.sender].assets.push( _asset );
       entities[_asset].owners.push( msg.sender );
    }
@@ -88,11 +99,17 @@ contract Handmedown {
   }
    
    modifier canClaim(address _asset){
+      bool flag = false;
       for(uint i = 0; i < entities[_asset].owners.length; i++){
-         if(entities[_asset].owners[i] == msg.sender)
-            _;
+         if(entities[_asset].owners[i] == msg.sender) {
+            flag = true;
+            break;
+         }
       }
-      revert();
+      if (flag == true)
+         _;
+      else
+         revert();
    }
 
    function getOwners (address _asset) public view returns (address[]) {
