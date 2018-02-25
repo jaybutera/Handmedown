@@ -18,7 +18,7 @@ contract Handmedown {
       bool isGiveReq;
    }
 
-   event RequestMade(address, address, bool);
+   event RequestMade(address requester, address requestee, bool isGiveReq);
 
 
    function requestHandoff (address _asset, address _leasee) public canClaim(_asset){
@@ -31,8 +31,8 @@ contract Handmedown {
       //entities[_asset].owners[_leasee] = true;
       //Make sure msg.sender is fulfilling an existing request
       require(requests[_asset].requestee == _leasee && requests[_asset].isGiveReq == true);
-      entities[_leasee].assets.push( _asset );
-      entities[_asset].owners.push( _leasee );
+      entities[msg.sender].assets.push( _asset );
+      entities[_asset].owners.push( msg.sender );
    }
 
    function requestReturn (address _asset, address _leasee) public canClaim(_asset){
@@ -57,7 +57,7 @@ contract Handmedown {
             delete entities[msg.sender].assets[i];
       }
    }
-   
+
    //First return is a list of all ownerships
 	//Second return is index of first coOwnerships (subsequent indices are coownerships)
 	function getInventory () external view returns(address[], uint){
@@ -87,5 +87,10 @@ contract Handmedown {
          if(entities[_asset].owners[i] == msg.sender)
             _;
       }
+   }
+
+   function getOwners (address _asset) public view returns (address[]) {
+      address[] memory owners = entities[_asset].owners;
+      return owners;
    }
 }
