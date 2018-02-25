@@ -18,14 +18,6 @@ contract Handmedown {
       bool isGiveReq;
    }
 
-   event RequestMade(address requester, address requestee, bool isGiveReq);
-
-
-   function requestHandoff (address _asset, address _leasee) public {
-      requests[ _asset ] = Request(msg.sender, _leasee, true);
-      RequestMade(msg.sender, _leasee, true);
-   }
-
    function acceptHandoff (address _asset) public {
       //entities[_leasee].assets[_asset] = true;
       //entities[_asset].owners[_leasee] = true;
