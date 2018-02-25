@@ -116,4 +116,8 @@ contract Handmedown {
       address[] memory owners = entities[_asset].owners;
       return owners;
    }
+   function getAssets (address _asset) public view returns (address[]) {
+      address[] memory assets = entities[_asset].assets;
+      return assets;
+   }
 }

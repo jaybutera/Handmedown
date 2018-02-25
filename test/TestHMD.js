@@ -18,13 +18,15 @@ contract('Handmedown', accounts => {
       it('Should handoff a child', async () => {
          await hmd_addr.requestHandoff(child, sitter, {from:par})
          //await hmd_addr.requests[child]
-         console.log('sup')
-         //assert(
          await hmd_addr.acceptHandoff(child, {from:sitter})
       })
       it('Should return list of owners', async () => {
          let owners = await hmd_addr.getOwners(child)
          console.log(owners)
+      })
+      it('Should return list of assets of parent', async () => {
+         let assets = await hmd_addr.getAssets(par)
+         console.log(assets)
       })
    })
 })
